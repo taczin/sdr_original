@@ -1,6 +1,8 @@
 from data.datasets import (
     WikipediaTextDatasetParagraphsSentences,
     WikipediaTextDatasetParagraphsSentencesTest,
+    XLSumDatasetParagraphsSentences,
+    XLSumDatasetParagraphsSentencesTest
 )
 from utils.argparse_init import str2bool
 from models.SDR.SDR_utils import MPerClassSamplerDeter
@@ -208,6 +210,7 @@ class SDR(TransformersBase):
         return parser
 
     def prepare_data(self):
+
         block_size = (
             self.hparams.block_size
             if hasattr(self.hparams, "block_size")
@@ -215,28 +218,54 @@ class SDR(TransformersBase):
             and self.hparams.block_size < self.tokenizer.max_len
             else self.tokenizer.max_len
         )
-        self.train_dataset = WikipediaTextDatasetParagraphsSentences(
-            tokenizer=self.tokenizer,
-            hparams=self.hparams,
-            dataset_name=self.hparams.dataset_name,
-            block_size=block_size,
-            mode="train",
-        )
-        self.val_dataset = WikipediaTextDatasetParagraphsSentences(
-            tokenizer=self.tokenizer,
-            hparams=self.hparams,
-            dataset_name=self.hparams.dataset_name,
-            block_size=block_size,
-            mode="val",
-        )
-        self.val_dataset.indices_map = self.val_dataset.indices_map[: self.hparams.limit_val_indices_batches]
-        self.val_dataset.labels = self.val_dataset.labels[: self.hparams.limit_val_indices_batches]
+        if (self.hparams.dataset_name == 'video_games') or (self.hparams.dataset_name == 'wines'):
+            self.train_dataset = WikipediaTextDatasetParagraphsSentences(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="train",
+            )
+            self.val_dataset = WikipediaTextDatasetParagraphsSentences(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="val",
+            )
+            self.val_dataset.indices_map = self.val_dataset.indices_map[: self.hparams.limit_val_indices_batches]
+            self.val_dataset.labels = self.val_dataset.labels[: self.hparams.limit_val_indices_batches]
 
-        self.test_dataset = WikipediaTextDatasetParagraphsSentencesTest(
-            tokenizer=self.tokenizer,
-            hparams=self.hparams,
-            dataset_name=self.hparams.dataset_name,
-            block_size=block_size,
-            mode="test",
-        )
+            self.test_dataset = WikipediaTextDatasetParagraphsSentencesTest(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="test",
+            )
+        elif self.hparams.dataset_name == "xlsum":
+            self.train_dataset = XLSumDatasetParagraphsSentences(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="train",
+            )
+            self.val_dataset = XLSumDatasetParagraphsSentences(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="val",
+            )
+            self.val_dataset.indices_map = self.val_dataset.indices_map[: self.hparams.limit_val_indices_batches]
+            self.val_dataset.labels = self.val_dataset.labels[: self.hparams.limit_val_indices_batches]
+
+            self.test_dataset = XLSumDatasetParagraphsSentencesTest(
+                tokenizer=self.tokenizer,
+                hparams=self.hparams,
+                dataset_name=self.hparams.dataset_name,
+                block_size=block_size,
+                mode="test",
+            )
 

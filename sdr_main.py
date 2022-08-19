@@ -10,7 +10,7 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from utils.argparse_init import default_arg_parser, init_parse_argparse_default_params
 import logging
-
+import datasets
 logging.basicConfig(level=logging.INFO)
 from pytorch_lightning.loggers import TensorBoardLogger
 
@@ -73,7 +73,7 @@ def main_train(model_class_pointer, hparams,parser):
         trainer.fit(model)
     else:
         if(hparams.resume_from_checkpoint is not None):
-            model = model.load_from_checkpoint(hparams.resume_from_checkpoint,hparams=hparams, map_location=torch.device(f"cpu"))
+            model = model.load_from_checkpoint(hparams.resume_from_checkpoint, hparams=hparams, map_location=torch.device(f"cpu"))
     trainer.test(model)
 
 

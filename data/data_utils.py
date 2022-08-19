@@ -16,8 +16,8 @@ def get_xlsum_gt_seeds_titles(titles=None, dataset_name="xlsum"):
     idxs = None
     gt_path = f"data/datasets/{dataset_name}/gt"
     gt = {}
-    for title in titles[:len(titles)]:
-        gt[title+" article"] = {title+" summary": 1}
+    for i, title in enumerate(titles[:int(len(titles)/2)]):
+        gt[title] = {titles[i+(int(len(titles)/2))]: 1}
     with open(gt_path, "wb") as f:
         pickle.dump(gt, f)
     popular_titles = list(gt.keys())

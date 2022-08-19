@@ -113,8 +113,10 @@ class SDR(TransformersBase):
                 outputs = [([to_numpy(section) for section in sample[0]], sample[1]) for sample in outputs]
             torch.save(outputs, save_outputs_path)
             print(f"\nSaved to {save_outputs_path}\n")
-
-            titles = popular_titles = [out[1][:-1] for out in outputs]
+            if self.hparams.dataset_name == 'xlsum':
+                titles = popular_titles = [out[1] for out in outputs]
+            else:
+                titles = popular_titles = [out[1][:-1] for out in outputs]
             idxs, gt_path = list(range(len(titles))), ""
 
             section_sentences_features = [out[0] for out in outputs]

@@ -54,7 +54,7 @@ class DocEmbeddingTemplate(LightningModule):
         getattr(self, f"{mode}_logs", None).append(all)
         self.log_step(all)
 
-        #output = collections.OrderedDict({"loss": self.tracks[f"tot_loss"]})
+        output = collections.OrderedDict({"loss": self.tracks[f"tot_loss"]})
         output = self.tracks["tot_loss"]
         return output
 

@@ -11,8 +11,8 @@ import torch
 import json
 import csv
 import sys
-#import datasets
-#from datasets import load_dataset
+import datasets
+from datasets import load_dataset
 from models.reco.recos_utils import index_amp
 
 
@@ -51,8 +51,8 @@ class WikipediaTextDatasetParagraphsSentences(Dataset):
             self.indices_map = []
 
             for idx_article, article in enumerate(tqdm(all_articles)):
-                if idx_article > 10:
-                    break
+                #if idx_article > 10:
+                #    break
                 this_sample_sections = []
                 title, sections = article[0], ast.literal_eval(article[1])
                 valid_sections_count = 0
@@ -228,8 +228,8 @@ class XLSumDatasetParagraphsSentences(Dataset):
         indices_map = []
 
         for idx_article, article in enumerate(tqdm(all_articles)):
-            if idx_article > 10:
-                break
+            #if idx_article > 10:
+            #    break
             this_sample_sections = []
             title = article['title']
             if summaries:
@@ -253,9 +253,9 @@ class XLSumDatasetParagraphsSentences(Dataset):
                     continue
                 valid_sentences_count = 0
                 if summaries:
-                    title_with_base_title = "{}:{}".format(title, "summary")
+                    title_with_base_title = "{} {}".format(title, "summary")
                 else:
-                    title_with_base_title = title
+                    title_with_base_title = "{} {}".format(title, "article")
                 for sent_idx, sent in enumerate(section[:self.max_sentences]):
                     tokenized_desc = self.tokenizer.convert_tokens_to_ids(
                         self.tokenizer.tokenize(json.dumps(sent[:self.max_sent_len])))[
@@ -275,7 +275,7 @@ class XLSumDatasetParagraphsSentences(Dataset):
                     valid_sentences_count += 1
                 this_sample_sections.append((this_sections_sentences, title_with_base_title))
                 valid_sections_count += 1
-            examples.append((this_sample_sections, title))
+            examples.append((this_sample_sections, title_with_base_title))
         labels = [idx_article for idx_article, _, _ in indices_map]
         return examples, labels, indices_map
 

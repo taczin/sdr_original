@@ -6,7 +6,7 @@ from data.datasets import (
 )
 from utils.argparse_init import str2bool
 from models.SDR.SDR_utils import MPerClassSamplerDeter
-from data.data_utils import get_gt_seeds_titles, reco_sentence_collate, reco_sentence_test_collate
+from data.data_utils import get_gt_seeds_titles, reco_sentence_collate, reco_sentence_test_collate, get_xlsum_gt_seeds_titles
 from functools import partial
 import os
 from models.reco.hierarchical_reco import vectorize_reco_hierarchical
@@ -98,6 +98,9 @@ class SDR(TransformersBase):
 
         return trackes
 
+    #def get_xlsum_gt(titles):
+    #    gt =
+
     def test_epoch_end(self, outputs, recos_path=None):
         if self.trainer.checkpoint_callback.last_model_path == "" and self.hparams.resume_from_checkpoint is None:
             self.trainer.checkpoint_callback.last_model_path = f"{self.hparams.hparams_dir}/no_train"
@@ -110,12 +113,17 @@ class SDR(TransformersBase):
                 outputs = [([to_numpy(section) for section in sample[0]], sample[1]) for sample in outputs]
             torch.save(outputs, save_outputs_path)
             print(f"\nSaved to {save_outputs_path}\n")
-
-            titles = popular_titles = [out[1][:-1] for out in outputs]
+            if self.hparams.dataset_name == 'xlsum':
+                titles = popular_titles = [out[1] for out in outputs]
+            else:
+                titles = popular_titles = [out[1][:-1] for out in outputs]
             idxs, gt_path = list(range(len(titles))), ""
 
             section_sentences_features = [out[0] for out in outputs]
-            popular_titles, idxs, gt_path = get_gt_seeds_titles(titles, self.hparams.dataset_name)
+            if self.hparams.dataset_name != "xlsum":
+                popular_titles, idxs, gt_path = get_gt_seeds_titles(titles, self.hparams.dataset_name)
+            else:
+                popular_titles, idxs, gt_path = get_xlsum_gt_seeds_titles(titles, self.hparams.dataset_name)
 
             self.hparams.test_sample_size = (
                 self.hparams.test_sample_size if self.hparams.test_sample_size > 0 else len(popular_titles)
